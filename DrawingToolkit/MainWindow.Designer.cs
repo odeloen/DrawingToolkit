@@ -1,14 +1,12 @@
-﻿using DrawingToolkit.Interfaces;
-using DrawingToolkit.Classes;
-
-namespace DrawingToolkit
+﻿namespace DrawingToolkitv01
 {
     partial class MainWindow
     {
         /// <summary>
         /// Required designer variable.
         /// </summary>
-        private System.ComponentModel.IContainer components = null;        
+        private System.ComponentModel.IContainer components = null;
+
         /// <summary>
         /// Clean up any resources being used.
         /// </summary>
@@ -36,9 +34,9 @@ namespace DrawingToolkit
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(923, 468);
+            this.ClientSize = new System.Drawing.Size(656, 393);
             this.Name = "MainWindow";
-            this.Text = "Drawing Toolkit";
+            this.Text = "Form1";
             this.ResumeLayout(false);
 
         }
@@ -47,42 +45,33 @@ namespace DrawingToolkit
 
         private void InitializeCanvas()
         {
-            ///
-            /// Canvas
-            ///
             this.canvas = new DefaultCanvas();
-            this.canvas.GetControl().Location = new System.Drawing.Point(50, 40);
-            this.canvas.GetControl().Size = this.ClientSize;
-            this.canvas.GetControl().BackColor = System.Drawing.Color.White;
-            this.Controls.Add(canvas.GetControl());
+            System.Windows.Forms.Control temp = (System.Windows.Forms.Control)canvas;
+            temp.Location = new System.Drawing.Point(0, 25);
+            temp.Size = this.ClientSize;
+            temp.BackColor = System.Drawing.Color.White;
+            this.Controls.Add(temp);
+            System.Console.WriteLine("Canvas Successfully Initialized");
         }
-
-        private void InitializeToolBox()
+        
+        private void InitializeToolbox()
         {
-            ///
-            /// Toolbox
-            ///          
             this.toolbox = new DefaultToolbox();
-            this.toolbox.SetCanvas(this.canvas);
-            this.toolbox.GetControl().Location = new System.Drawing.Point(0, 40);
-            this.toolbox.GetControl().Size = new System.Drawing.Size(50, this.ClientSize.Height);
-            this.Controls.Add(this.toolbox.GetControl());
+            toolbox.AddTool(new ToolClasses.DefaultTool());
+            toolbox.AddTool(new ToolClasses.LineTool());
+            toolbox.AddTool(new ToolClasses.SquareTool());
+            toolbox.AddTool(new ToolClasses.CircleTool());
+            System.Windows.Forms.ToolStrip temp = (System.Windows.Forms.ToolStrip)toolbox;
+            temp.Location = new System.Drawing.Point(0,0);
+            //temp.Size = new System.Drawing.Size(25,this.ClientSize.Height);
+            temp.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.toolbox.SetCanvas(canvas);            
+            this.Controls.Add(temp);
+            System.Console.WriteLine("Toolbox Successfully Initialized");
         }
 
-        private void InitializeMenubar()
-        {
-            ///
-            /// Menubar
-            /// 
-            this.menubar = new DefaultMenubar();
-            this.menubar.GetControl().Location = new System.Drawing.Point(0, 0);
-            this.menubar.GetControl().Size = new System.Drawing.Size(this.ClientSize.Width, 20);
-            this.Controls.Add(this.menubar.GetControl());
-        }
-
-        private ICanvas canvas = null;
-        private IToolBox toolbox = null;
-        private IMenubar menubar = null;
+        Interfaces.ICanvas canvas;
+        Interfaces.IToolbox toolbox;
     }
 }
 

@@ -3,21 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace DrawingToolkit.Interfaces
+namespace DrawingToolkitv01.Interfaces
 {
     interface ICanvas
     {
-        ITool Tool { get; set; }
+        ITool ActiveTool { get; set; }
 
-        ICanvas GetCanvas();
-        Control GetControl();
-        List<IDrawingObject> GetObjectsToDraw();
+        void AddDrawingObject(IDrawingObject obj);
+        void RemoveDrawingObject(IDrawingObject obj);
 
-        void SetMode(int x);
-
-        void AddDrawingObject(IDrawingObject newObject);
-        void RemoveDrawingObject(int idx);
+        IDrawingObject SelectObjectAt(System.Drawing.Point loc);
+        void DeselectAllObject(List<IDrawingObject> obj);
     }
 }

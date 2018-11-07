@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 
-namespace DrawingToolkit.Interfaces
+namespace DrawingToolkitv01.Interfaces
 {
     interface ITool
     {
-        ITool GetTool();
-        Control GetControl();
+        ICanvas TargetCanvas { get; set; }
 
-        ICanvas Canvas { get; set; }
-
-        void OnMouseDown(System.Drawing.Point x);
-        void OnMouseUp(System.Drawing.Point x);
+        void OnMouseDown(object sender, System.Windows.Forms.MouseEventArgs e);
+        void OnMouseUp(object sender, System.Windows.Forms.MouseEventArgs e);
+        void OnMouseMove(object sender, System.Windows.Forms.MouseEventArgs e);
+        void OnKeyDown(object sender, System.Windows.Forms.Keys keyData);
+        void OnKeyUp(object sender, System.Windows.Forms.Keys keyData);
     }
 }

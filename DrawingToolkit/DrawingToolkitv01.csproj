@@ -4,10 +4,10 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{81345CE9-296F-4634-854E-0459B13ED3EA}</ProjectGuid>
+    <ProjectGuid>{88516145-8DF2-482C-999C-FB69D63CDE66}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>DrawingToolkit</RootNamespace>
-    <AssemblyName>DrawingToolkit</AssemblyName>
+    <RootNamespace>DrawingToolkitv01</RootNamespace>
+    <AssemblyName>DrawingToolkitv01</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
@@ -45,53 +45,44 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Classes\Circle.cs" />
-    <Compile Include="Classes\CircleTool.cs">
+    <Compile Include="DefaultCanvas.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\DefaultCanvas.cs">
+    <Compile Include="DefaultToolbox.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="Classes\DefaultMenubar.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes\DefaultToolbox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes\Line.cs" />
-    <Compile Include="Classes\LineTool.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes\MenuItemFile.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes\MoveTool.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes\Square.cs" />
-    <Compile Include="Classes\SquareTool.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Classes\UndoTool.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Interfaces\ICanvas.cs" />
-    <Compile Include="Interfaces\ICommand.cs" />
-    <Compile Include="Interfaces\IDrawingObject.cs" />
-    <Compile Include="Interfaces\IMenubar.cs" />
-    <Compile Include="Interfaces\IMenuItem.cs" />
-    <Compile Include="Interfaces\ITool.cs" />
-    <Compile Include="Interfaces\IToolbar.cs" />
-    <Compile Include="Interfaces\IToolBox.cs" />
-    <Compile Include="Interfaces\IToolItem.cs" />
+    <Compile Include="DrawingObjectClasses\Circle.cs" />
+    <Compile Include="DrawingObjectClasses\ControlPoint.cs" />
+    <Compile Include="DrawingObjectClasses\Line.cs" />
+    <Compile Include="DrawingObjectClasses\Square.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="MainWindow.Designer.cs">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Interfaces\ICanvas.cs" />
+    <Compile Include="Interfaces\IDrawingObject.cs" />
+    <Compile Include="Interfaces\IState.cs" />
+    <Compile Include="Interfaces\ITool.cs" />
+    <Compile Include="Interfaces\IToolbox.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StateClasses\MoveState.cs" />
+    <Compile Include="StateClasses\PreviewState.cs" />
+    <Compile Include="StateClasses\StaticState.cs" />
+    <Compile Include="ToolClasses\CircleTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolClasses\LineTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolClasses\DefaultTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolClasses\SquareTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <EmbeddedResource Include="MainWindow.resx">
       <DependentUpon>MainWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -117,6 +108,5 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

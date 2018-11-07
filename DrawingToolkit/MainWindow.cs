@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace DrawingToolkit
+namespace DrawingToolkitv01
 {
     public partial class MainWindow : Form
     {
@@ -16,8 +16,7 @@ namespace DrawingToolkit
         {
             InitializeComponent();
             InitializeCanvas();
-            InitializeToolBox();
-            InitializeMenubar();
-        }        
+            InitializeToolbox();            
+        }
     }
 }

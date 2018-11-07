@@ -1,23 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Drawing;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DrawingToolkit.Interfaces
+namespace DrawingToolkitv01.Interfaces
 {
     interface IDrawingObject
     {
-        Point A { get; set; }
-        Point B { get; set; }
+        System.Drawing.Graphics TargetGraphics { set; }
+        System.Drawing.Point Start { get; set; }
+        System.Drawing.Point End { get; set; }
+        IDrawingObject Parent { get; set; }
 
-        void SwapX();
-        void SwapY();
+        void Draw();
+        void Select();
+        void Deselect();
+        void Translate(System.Drawing.Point loc);
+        IDrawingObject Intersect(System.Drawing.Point loc);
+        List<IDrawingObject> GetComponent();
+        void AddComponent(IDrawingObject obj);
+        void RemoveComponent(IDrawingObject obj);
 
-        void Draw(Graphics graphics, Pen pen);
-
-        IDrawingObject Collide(Point X);
-        void Move(Point target);
+        void RenderOnPreview();
+        void RenderOnStatic();
+        void RenderOnMoveState();
+        void RenderOnRotateState();
     }
 }

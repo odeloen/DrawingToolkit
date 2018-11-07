@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace DrawingToolkit.Properties
+namespace DrawingToolkitv01.Properties
 {
 
 

@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace DrawingToolkitv01.Interfaces
 {
-    interface IToolbox
+    interface IState
     {
-        void AddTool(ITool tool);
-        void RemoveTool(ITool tool);
-        void SetCanvas(ICanvas canvas);
+        //IState GetInstance();
+
+        void Draw(IDrawingObject obj);
+        IState NextState();
+        IState PrevState();        
     }
 }
