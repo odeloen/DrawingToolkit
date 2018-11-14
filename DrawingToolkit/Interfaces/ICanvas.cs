@@ -11,9 +11,10 @@ namespace DrawingToolkitv01.Interfaces
         ITool ActiveTool { get; set; }
 
         void AddDrawingObject(IDrawingObject obj);
+        void AddDrawingObjectAt(int index, IDrawingObject obj);
         void RemoveDrawingObject(IDrawingObject obj);
 
         IDrawingObject SelectObjectAt(System.Drawing.Point loc);
-        void DeselectAllObject(List<IDrawingObject> obj);
+        void DeselectAllObject();
     }
 }

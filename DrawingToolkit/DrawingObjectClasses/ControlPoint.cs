@@ -11,7 +11,7 @@ using DrawingToolkitv01.StateClasses;
 
 namespace DrawingToolkitv01.DrawingObjectClasses
 {
-    class ControlPoint : IDrawingObject
+    class ControlPoint : Square
     {
         Point start, end;        
         private Pen pen;
@@ -19,12 +19,9 @@ namespace DrawingToolkitv01.DrawingObjectClasses
         IState currentState;
         Graphics _g;
 
-        IDrawingObject parent;
-
         public Point Start { get { return this.start; } set { this.start = value; } }
         public Point End { get { return this.end; } set { this.end = value; } }
         public Graphics TargetGraphics { set { this._g = value; } }
-        public IDrawingObject Parent { get { return this.parent; } set { this.parent = value; } }
 
         public ControlPoint()
         {
@@ -65,21 +62,6 @@ namespace DrawingToolkitv01.DrawingObjectClasses
 
             if (loc.X > x && loc.X < x + Math.Abs(this.start.X - this.end.X) && loc.Y > y && loc.Y < y + Math.Abs(this.start.Y - this.end.Y)) return this;
             return null;
-        }
-
-        public List<IDrawingObject> GetComponent()
-        {
-            return null;
-        }
-
-        public void AddComponent(IDrawingObject obj)
-        {
-            //this.Component.Add(obj);
-        }
-
-        public void RemoveComponent(IDrawingObject obj)
-        {
-            //this.Component.Remove(obj);
         }
 
         public void Translate(Point loc)

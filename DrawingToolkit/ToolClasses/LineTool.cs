@@ -54,12 +54,12 @@ namespace DrawingToolkitv01.ToolClasses
             }            
         }
 
-        public void OnKeyDown(object sender, Keys keyData)
+        public void OnKeyDown(object sender, KeyEventArgs e)
         {
 
         }
 
-        public void OnKeyUp(object sender, Keys keyData)
+        public void OnKeyUp(object sender, KeyEventArgs e)
         {
 
         }
@@ -68,7 +68,7 @@ namespace DrawingToolkitv01.ToolClasses
         {
             base.OnCheckedChanged(e);
             this._targetCanvas.ActiveTool = this;
-            this._targetCanvas.DeselectAllObject(null);
+            this._targetCanvas.DeselectAllObject();
             Console.WriteLine("Tool has been changed to " + this.Name);
         }
     }

@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingToolkitv01", "DrawingToolkitv01\DrawingToolkitv01.csproj", "{88516145-8DF2-482C-999C-FB69D63CDE66}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DrawingToolkit", "DrawingToolkit\DrawingToolkit.csproj", "{88516145-8DF2-482C-999C-FB69D63CDE66}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

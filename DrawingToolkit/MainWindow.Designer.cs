@@ -57,10 +57,11 @@
         private void InitializeToolbox()
         {
             this.toolbox = new DefaultToolbox();
-            toolbox.AddTool(new ToolClasses.DefaultTool());
+            toolbox.AddTool(new ToolClasses.SelectionTool());
             toolbox.AddTool(new ToolClasses.LineTool());
             toolbox.AddTool(new ToolClasses.SquareTool());
             toolbox.AddTool(new ToolClasses.CircleTool());
+            toolbox.AddTool(new ToolClasses.LineConnectorTool());
             System.Windows.Forms.ToolStrip temp = (System.Windows.Forms.ToolStrip)toolbox;
             temp.Location = new System.Drawing.Point(0,0);
             //temp.Size = new System.Drawing.Size(25,this.ClientSize.Height);

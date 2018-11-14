@@ -13,7 +13,7 @@ namespace DrawingToolkitv01.Interfaces
         void OnMouseDown(object sender, System.Windows.Forms.MouseEventArgs e);
         void OnMouseUp(object sender, System.Windows.Forms.MouseEventArgs e);
         void OnMouseMove(object sender, System.Windows.Forms.MouseEventArgs e);
-        void OnKeyDown(object sender, System.Windows.Forms.Keys keyData);
-        void OnKeyUp(object sender, System.Windows.Forms.Keys keyData);
+        void OnKeyDown(object sender, System.Windows.Forms.KeyEventArgs e);
+        void OnKeyUp(object sender, System.Windows.Forms.KeyEventArgs e);
     }
 }

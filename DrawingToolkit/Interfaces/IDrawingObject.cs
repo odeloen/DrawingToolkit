@@ -8,17 +8,17 @@ namespace DrawingToolkitv01.Interfaces
 {
     interface IDrawingObject
     {
+        event EventHandler LocationChanged;
+
         System.Drawing.Graphics TargetGraphics { set; }
         System.Drawing.Point Start { get; set; }
         System.Drawing.Point End { get; set; }
-        IDrawingObject Parent { get; set; }
 
         void Draw();
         void Select();
         void Deselect();
         void Translate(System.Drawing.Point loc);
         IDrawingObject Intersect(System.Drawing.Point loc);
-        List<IDrawingObject> GetComponent();
         void AddComponent(IDrawingObject obj);
         void RemoveComponent(IDrawingObject obj);
 

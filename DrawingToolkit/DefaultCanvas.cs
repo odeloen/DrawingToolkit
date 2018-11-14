@@ -29,6 +29,11 @@ namespace DrawingToolkitv01
             this.ObjectsToDraw.Add(obj);
         }
 
+        public void AddDrawingObjectAt(int index, IDrawingObject obj)
+        {
+            this.ObjectsToDraw.Insert(index,obj);
+        }
+
         public void RemoveDrawingObject(IDrawingObject obj)
         {
             this.ObjectsToDraw.Remove(obj);
@@ -46,24 +51,15 @@ namespace DrawingToolkitv01
                     selected.Select();
                     break;
                 }
-            }
-            //DeselectAllObject(selected);
+            }            
             return selected;
         }
 
-        public void DeselectAllObject(List<IDrawingObject> selected)
+        public void DeselectAllObject()
         {
             foreach (IDrawingObject obj in this.ObjectsToDraw)
-            {
-                if (selected != null)
-                {
-                    foreach (IDrawingObject sel in selected)
-                    {
-                        if (obj != sel)
-                            obj.Deselect();
-                    }
-                }
-                else obj.Deselect();
+            {                
+                obj.Deselect();
             }
         }
 
@@ -77,27 +73,6 @@ namespace DrawingToolkitv01
                 obj.Draw();
             }                
         }
-
-        protected override void OnKeyDown(KeyEventArgs e)
-        {
-            base.OnKeyDown(e);
-            
-            if (this._activeTool != null)
-            {
-                this._activeTool.OnKeyDown(this, e.KeyData);
-            }            
-        }
-
-        protected override void OnKeyUp(KeyEventArgs e)
-        {
-            base.OnKeyUp(e);
-
-            if (this._activeTool != null)
-            {
-                this._activeTool.OnKeyUp(this, e.KeyData);
-            }
-        }
-
 
         protected override void OnMouseDown(MouseEventArgs e)
         {
@@ -127,6 +102,28 @@ namespace DrawingToolkitv01
             if (this._activeTool != null)
             {
                 this._activeTool.OnMouseMove(this, e);
+                this.Invalidate();
+                this.Update();
+            }
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+            if (this._activeTool != null)
+            {
+                this._activeTool.OnKeyDown(this, e);
+                this.Invalidate();
+                this.Update();
+            }
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            base.OnKeyUp(e);
+            if (this._activeTool != null)
+            {                
+                this._activeTool.OnKeyUp(this, e);
                 this.Invalidate();
                 this.Update();
             }

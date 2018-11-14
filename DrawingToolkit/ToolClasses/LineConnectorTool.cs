@@ -12,15 +12,15 @@ using DrawingToolkitv01.DrawingObjectClasses;
 
 namespace DrawingToolkitv01.ToolClasses
 {
-    class CircleTool : ToolStripButton, ITool
+    class LineConnectorTool : ToolStripButton, ITool
     {
         ICanvas _targetCanvas;
-        Circle temp;
+        LineConnector newLine;
 
-        public CircleTool()
+        public LineConnectorTool()
         {
-            this.Name = "Circle Tool";
-            this.Image = new Bitmap("..\\..\\Assets\\Circle.png");
+            this.Name = "Line Connector Tool";
+            this.Image = new Bitmap("..\\..\\Assets\\line.png");
             this.CheckOnClick = true;
         }
 
@@ -30,28 +30,40 @@ namespace DrawingToolkitv01.ToolClasses
         {
             if (e.Button == MouseButtons.Left)
             {
-                temp = new Circle();
-                temp.Start = e.Location;
-                temp.End = e.Location;
-                this._targetCanvas.AddDrawingObject(temp);
+                IDrawingObject temp = this._targetCanvas.SelectObjectAt(e.Location);                
+                if (temp != null)
+                {
+                    newLine = new LineConnector();
+                    newLine.A = temp;
+                    newLine.End = e.Location;
+                    this._targetCanvas.AddDrawingObject(newLine);
+                    temp.Deselect();
+                }                
             }
         }
 
         public void OnMouseUp(object sender, MouseEventArgs e)
         {
-            if (temp != null)
+            if (newLine != null)
             {
-                //this._targetCanvas.RemoveDrawingObject(temp);
-                temp.Deselect();
-                temp = null;
+                IDrawingObject temp = this._targetCanvas.SelectObjectAt(e.Location);
+                if (temp == null) this._targetCanvas.RemoveDrawingObject(newLine);
+                else
+                {
+                    newLine.B = temp;
+                    newLine.Deselect();
+                    this._targetCanvas.RemoveDrawingObject(newLine);
+                    this._targetCanvas.AddDrawingObjectAt(0, newLine);
+                    newLine = null;
+                }                
             }
         }
 
         public void OnMouseMove(object sender, MouseEventArgs e)
         {
-            if (temp != null)
+            if (newLine != null)
             {
-                temp.End = e.Location;
+                newLine.End = e.Location;
             }
         }
 
