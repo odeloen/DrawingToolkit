@@ -67,10 +67,15 @@ namespace DrawingToolkitv01.DrawingObjectClasses
             ControlPoints = null;
         }
 
+        public List<IDrawingObject> GetComponent()
+        {
+            return this.Component;
+        }
+
         public void AddComponent(IDrawingObject obj)
         {
             this.Component.Add(obj);
-        }
+        }        
 
         public void RemoveComponent(IDrawingObject obj)
         {

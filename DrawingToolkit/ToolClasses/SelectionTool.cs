@@ -105,11 +105,23 @@ namespace DrawingToolkitv01.ToolClasses
                     Console.WriteLine("Control + G down detected");
                     if (this._targetObjects.Count() > 1)
                     {
-                        for (int i = 1; i< this._targetObjects.Count(); i++)
+                        for (int i = 1; i< this._targetObjects.Count; i++)
                         {
                             this._targetObjects[0].AddComponent(this._targetObjects[i]);
                             this._targetCanvas.RemoveDrawingObject(this._targetObjects[i]);
                         }
+                    }
+                    break;
+
+                case Keys.Control | Keys.H:
+                    Console.WriteLine("Control + H down detected");
+                    Console.WriteLine(this._targetObjects.Count);
+                    List<IDrawingObject> temp = this._targetObjects[0].GetComponent();
+                    foreach(IDrawingObject obj in temp.ToList())
+                    {
+                        this._targetObjects[0].RemoveComponent(obj);
+                        this._targetObjects.Add(obj);
+                        this._targetCanvas.AddDrawingObject(obj);
                     }
                     break;
             }            
@@ -127,15 +139,24 @@ namespace DrawingToolkitv01.ToolClasses
                 case Keys.Control | Keys.G:
                     Console.WriteLine("Control + G up detected");
                     break;
+
+                case Keys.Control | Keys.H:
+                    Console.WriteLine("Control + H up detected");
+                    break;
             }
         }
 
         protected override void OnCheckedChanged(EventArgs e)
         {
-            base.OnCheckedChanged(e);
-            if(this.TargetCanvas.ActiveTool.GetType() != this.GetType()) this._targetCanvas.DeselectAllObject();
-            this._targetCanvas.ActiveTool = this;            
+            base.OnCheckedChanged(e);         
+        }
+
+        protected override void OnClick(EventArgs e)
+        {
+            base.OnClick(e);
+            this._targetCanvas.ActiveTool = this;
+            this._targetCanvas.DeselectAllObject();
             Console.WriteLine("Tool has been changed to " + this.Name);
-        }        
+        }
     }
 }

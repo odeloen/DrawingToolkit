@@ -67,7 +67,12 @@ namespace DrawingToolkitv01.ToolClasses
 
         protected override void OnCheckedChanged(EventArgs e)
         {
-            base.OnCheckedChanged(e);
+            base.OnCheckedChanged(e);            
+        }
+
+        protected override void OnClick(EventArgs e)
+        {
+            base.OnClick(e);
             this._targetCanvas.ActiveTool = this;
             this._targetCanvas.DeselectAllObject();
             Console.WriteLine("Tool has been changed to " + this.Name);

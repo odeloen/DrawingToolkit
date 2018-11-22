@@ -66,6 +66,11 @@ namespace DrawingToolkitv01.DrawingObjectClasses
             }
         }
 
+        public List<IDrawingObject> GetComponent()
+        {
+            return this.Component;
+        }
+
         public void AddComponent(IDrawingObject obj)
         {
             this.Component.Add(obj);

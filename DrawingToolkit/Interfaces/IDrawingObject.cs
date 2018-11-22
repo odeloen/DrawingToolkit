@@ -19,6 +19,7 @@ namespace DrawingToolkitv01.Interfaces
         void Deselect();
         void Translate(System.Drawing.Point loc);
         IDrawingObject Intersect(System.Drawing.Point loc);
+        List<IDrawingObject> GetComponent();
         void AddComponent(IDrawingObject obj);
         void RemoveComponent(IDrawingObject obj);
 
