@@ -18,7 +18,7 @@ namespace DrawingToolkitv01.ToolClasses
         public RedoTool()
         {
             this.Name = "Line Tool";
-            this.Image = new Bitmap("..\\..\\Assets\\line.png");
+            this.Image = new Bitmap("..\\..\\Assets\\redo-6.png");
             this.CheckOnClick = true;
         }
 

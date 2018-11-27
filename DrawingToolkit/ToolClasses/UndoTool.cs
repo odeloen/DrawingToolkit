@@ -18,7 +18,7 @@ namespace DrawingToolkitv01.ToolClasses
         public UndoTool()
         {
             this.Name = "Line Tool";
-            this.Image = new Bitmap("..\\..\\Assets\\line.png");
+            this.Image = new Bitmap("..\\..\\Assets\\Undo.png");
             this.CheckOnClick = true;
         }
 

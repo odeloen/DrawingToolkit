@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandClasses\CreateDrawingObjectCommand.cs" />
     <Compile Include="CommandClasses\TranslateCommand.cs" />
     <Compile Include="DefaultCanvas.cs">
       <SubType>Component</SubType>

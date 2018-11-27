@@ -9,6 +9,7 @@ using System.Windows.Forms;
 
 using DrawingToolkitv01.Interfaces;
 using DrawingToolkitv01.DrawingObjectClasses;
+using DrawingToolkitv01.CommandClasses;
 
 namespace DrawingToolkitv01.ToolClasses
 {
@@ -41,7 +42,8 @@ namespace DrawingToolkitv01.ToolClasses
         {
             if (temp != null)
             {
-                //this._targetCanvas.RemoveDrawingObject(temp);
+                CreateDrawingObjectCommand cmd = new CreateDrawingObjectCommand(this.temp, this._targetCanvas);
+                this._targetCanvas.AddCommand(cmd);
                 temp.Deselect();
                 temp = null;
             }
