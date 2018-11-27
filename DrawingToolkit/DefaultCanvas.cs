@@ -13,6 +13,7 @@ namespace DrawingToolkitv01
     class DefaultCanvas : Control, ICanvas
     {
         List<IDrawingObject> ObjectsToDraw;
+        IUndoRedo undoRedo;
         ITool _activeTool;
 
         public ITool ActiveTool { get { return this._activeTool; } set { this._activeTool = value; } }
@@ -20,6 +21,7 @@ namespace DrawingToolkitv01
         public DefaultCanvas()
         {
             this.ObjectsToDraw = new List<IDrawingObject>();
+            this.undoRedo = new DefaultUndoRedo(this);
             this.DoubleBuffered = true;            
             this._activeTool = null;
         }
@@ -61,6 +63,30 @@ namespace DrawingToolkitv01
             {                
                 obj.Deselect();
             }
+        }
+
+        public void AddCommand(ICommand command)
+        {
+            this.undoRedo.AddCommand(command);
+        }
+
+        public void RemoveCommand(ICommand command)
+        {
+            this.undoRedo.RemoveCommand(command);
+        }
+
+        public void Undo()
+        {
+            this.undoRedo.Undo();
+            this.Invalidate();
+            this.Update();
+        }
+
+        public void Redo()
+        {
+            this.undoRedo.Redo();
+            this.Invalidate();
+            this.Update();
         }
 
         protected override void OnPaint(PaintEventArgs e)

@@ -9,6 +9,7 @@ using System.Windows.Forms;
 
 using DrawingToolkitv01.Interfaces;
 using DrawingToolkitv01.DrawingObjectClasses;
+using DrawingToolkitv01.CommandClasses;
 
 namespace DrawingToolkitv01.ToolClasses
 {
@@ -20,6 +21,7 @@ namespace DrawingToolkitv01.ToolClasses
         bool StateLeftMouseDown;
         Point lastPoint;
         Point lastDiff;
+        bool Move;
 
         public SelectionTool()
         {
@@ -29,6 +31,7 @@ namespace DrawingToolkitv01.ToolClasses
             this._targetObjects = new List<IDrawingObject>();            
             this.StateShiftDown = false;
             this.StateLeftMouseDown = false;
+            this.Move = false;
         }
 
         public ICanvas TargetCanvas { get { return this._targetCanvas; } set { this._targetCanvas = value; } }
@@ -72,7 +75,17 @@ namespace DrawingToolkitv01.ToolClasses
         }
 
         public void OnMouseUp(object sender, MouseEventArgs e)
-        {            
+        {
+            if (Move)
+            {
+                foreach(IDrawingObject obj in this._targetObjects)
+                {
+                    TranslateCommand cmd = new TranslateCommand(obj, lastDiff);
+                    this._targetCanvas.AddCommand(cmd);
+                }
+                Move = false;
+            }
+
             StateLeftMouseDown = false;
             this.lastDiff = new Point(0,0);
         }
@@ -89,6 +102,7 @@ namespace DrawingToolkitv01.ToolClasses
                     obj.Translate(new Point(diffX, diffY));
                 }
                 this.lastDiff = new Point(-diffX, -diffY);
+                this.Move = true;
             }            
         }
 

@@ -45,18 +45,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CommandClasses\TranslateCommand.cs" />
     <Compile Include="DefaultCanvas.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="DefaultToolbox.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="DefaultUndoRedo.cs" />
     <Compile Include="DrawingObjectClasses\Circle.cs" />
     <Compile Include="DrawingObjectClasses\ControlPoint.cs" />
     <Compile Include="DrawingObjectClasses\Line.cs" />
     <Compile Include="DrawingObjectClasses\LineConnector.cs" />
     <Compile Include="DrawingObjectClasses\Square.cs" />
     <Compile Include="Interfaces\ILocationMonitor.cs" />
+    <Compile Include="Interfaces\ICommand.cs" />
+    <Compile Include="Interfaces\IUndoRedo.cs" />
     <Compile Include="MainWindow.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -82,10 +86,16 @@
     <Compile Include="ToolClasses\LineTool.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="ToolClasses\RedoTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ToolClasses\SelectionTool.cs">
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="ToolClasses\SquareTool.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="ToolClasses\UndoTool.cs">
       <SubType>Component</SubType>
     </Compile>
     <EmbeddedResource Include="MainWindow.resx">

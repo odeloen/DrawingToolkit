@@ -16,5 +16,11 @@ namespace DrawingToolkitv01.Interfaces
 
         IDrawingObject SelectObjectAt(System.Drawing.Point loc);
         void DeselectAllObject();
+
+        void AddCommand(ICommand cmd);
+        void RemoveCommand(ICommand cmd);
+
+        void Undo();
+        void Redo();
     }
 }

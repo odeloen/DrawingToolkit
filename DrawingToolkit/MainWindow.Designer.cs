@@ -63,6 +63,8 @@
             toolbox.AddTool(new ToolClasses.SquareTool());
             toolbox.AddTool(new ToolClasses.CircleTool());
             toolbox.AddTool(new ToolClasses.LineConnectorTool());
+            toolbox.AddTool(new ToolClasses.UndoTool());
+            toolbox.AddTool(new ToolClasses.RedoTool());
             System.Windows.Forms.ToolStrip temp = (System.Windows.Forms.ToolStrip)toolbox;
             temp.Location = new System.Drawing.Point(0,0);
             //temp.Size = new System.Drawing.Size(25,this.ClientSize.Height);
