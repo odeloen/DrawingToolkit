@@ -29,6 +29,8 @@ namespace DrawingToolkitv01.ToolClasses
 
         public void OnMouseDown(object sender, MouseEventArgs e)
         {
+            //Console.WriteLine("ALALA");
+            
             if (e.Button == MouseButtons.Left)
             {
                 temp = new Square();

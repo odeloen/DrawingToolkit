@@ -16,7 +16,7 @@ namespace DrawingToolkitv01.DrawingObjectClasses
         public event EventHandler LocationChanged;
 
         Point start, end;        
-        private Pen pen;
+        private Pen pen;        
 
         List<IDrawingObject> Component;
         List<ControlPoint> ControlPoints;
@@ -26,7 +26,7 @@ namespace DrawingToolkitv01.DrawingObjectClasses
 
         public Point Start { get { return this.start; } set { this.start = value; } }
         public Point End { get { return this.end; } set { this.end = value; } }
-        public Graphics TargetGraphics { set { this._g = value; } }        
+        public Graphics TargetGraphics { set { this._g = value; } }                
 
         public Square()
         {

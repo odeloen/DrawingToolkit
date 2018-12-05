@@ -74,8 +74,32 @@
             System.Console.WriteLine("Toolbox Successfully Initialized");
         }
 
+        private void InitializeStrategy()
+        {
+            this.StrategyBox = new System.Windows.Forms.ComboBox();
+            this.StrategyBox.Items.Add("Default");
+            this.StrategyBox.Items.Add("Tree");
+            this.StrategyBox.Location = new System.Drawing.Point(500,2);
+            this.StrategyBox.SelectedIndex = 0;
+            this.StrategyBox.SelectedIndexChanged += this.OnIndexChanged;
+            this.Controls.Add(this.StrategyBox);
+        }
+
+        private void OnIndexChanged(object sender, System.EventArgs e)
+        {
+            if (this.StrategyBox.SelectedIndex == 0)
+            {
+                this.canvas.ActiveStrategy = new StrategyClasses.DefaultStrategy();
+            }
+            else
+            {
+                this.canvas.ActiveStrategy = new StrategyClasses.RTreeStrategy();
+            }
+        }
+
         Interfaces.ICanvas canvas;
         Interfaces.IToolbox toolbox;
+        System.Windows.Forms.ComboBox StrategyBox;
     }
 }
 

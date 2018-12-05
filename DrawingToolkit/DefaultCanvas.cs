@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Drawing;
 using System.Windows.Forms;
 using DrawingToolkitv01.Interfaces;
+using DrawingToolkitv01.StrategyClasses;
 
 namespace DrawingToolkitv01
 {
@@ -15,8 +16,11 @@ namespace DrawingToolkitv01
         List<IDrawingObject> ObjectsToDraw;
         IUndoRedo undoRedo;
         ITool _activeTool;
+        IStrategy strategy;
 
         public ITool ActiveTool { get { return this._activeTool; } set { this._activeTool = value; } }
+
+        public IStrategy ActiveStrategy { get => this.strategy; set => this.strategy = value; }
 
         public DefaultCanvas()
         {
@@ -24,45 +28,32 @@ namespace DrawingToolkitv01
             this.undoRedo = new DefaultUndoRedo(this);
             this.DoubleBuffered = true;            
             this._activeTool = null;
+            this.strategy = new DefaultStrategy();
         }
 
         public void AddDrawingObject(IDrawingObject obj)
-        {            
-            this.ObjectsToDraw.Add(obj);
+        {
+            this.strategy.AddDrawingObject(obj);            
         }
 
         public void AddDrawingObjectAt(int index, IDrawingObject obj)
         {
-            this.ObjectsToDraw.Insert(index,obj);
+            this.strategy.AddDrawingObjectAt(obj,index);            
         }
 
         public void RemoveDrawingObject(IDrawingObject obj)
         {
-            this.ObjectsToDraw.Remove(obj);
+            this.strategy.RemoveDrawingObject(obj);            
         }
 
         public IDrawingObject SelectObjectAt(Point loc)
-        {            
-            IDrawingObject selected = null;
-
-            foreach(IDrawingObject obj in ObjectsToDraw)
-            {
-                selected = obj.Intersect(loc);
-                if (selected != null)
-                {
-                    selected.Select();
-                    break;
-                }
-            }            
-            return selected;
+        {                                  
+            return this.strategy.SelectObjectAt(loc);
         }
 
         public void DeselectAllObject()
         {
-            foreach (IDrawingObject obj in this.ObjectsToDraw)
-            {                
-                obj.Deselect();
-            }
+            this.strategy.DeselectAllObject();            
         }
 
         public void AddCommand(ICommand command)
@@ -92,12 +83,7 @@ namespace DrawingToolkitv01
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            
-            foreach (IDrawingObject obj in ObjectsToDraw)
-            {
-                obj.TargetGraphics = e.Graphics;
-                obj.Draw();
-            }                
+            this.strategy.Draw(e.Graphics);            
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -117,6 +103,7 @@ namespace DrawingToolkitv01
             if (this._activeTool != null)
             {
                 this._activeTool.OnMouseUp(this, e);
+                this.strategy.StrategyMouseUp();
                 this.Invalidate();
                 this.Update();
             }

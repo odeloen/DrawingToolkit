@@ -16,7 +16,8 @@ namespace DrawingToolkitv01
         {
             InitializeComponent();
             InitializeCanvas();
-            InitializeToolbox();            
+            InitializeToolbox();
+            InitializeStrategy();
         }
     }
 }

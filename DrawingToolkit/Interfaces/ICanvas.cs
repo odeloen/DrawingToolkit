@@ -9,6 +9,7 @@ namespace DrawingToolkitv01.Interfaces
     interface ICanvas
     {
         ITool ActiveTool { get; set; }
+        IStrategy ActiveStrategy { get; set; }
 
         void AddDrawingObject(IDrawingObject obj);
         void AddDrawingObjectAt(int index, IDrawingObject obj);
