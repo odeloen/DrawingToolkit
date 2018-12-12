@@ -178,5 +178,13 @@ namespace DrawingToolkitv01.DrawingObjectClasses
                 LocationChanged(this, EventArgs.Empty);
             }
         }
+
+        public int GetArea()
+        {
+            int width = Math.Abs(this.start.X - this.end.X);
+            int height = Math.Abs(this.start.Y - this.end.Y);
+
+            return width * height;
+        }
     }
 }

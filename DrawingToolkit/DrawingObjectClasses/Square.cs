@@ -19,7 +19,6 @@ namespace DrawingToolkitv01.DrawingObjectClasses
         private Pen pen;        
 
         List<IDrawingObject> Component;
-        List<ControlPoint> ControlPoints;
 
         IState currentState;
         Graphics _g;
@@ -64,7 +63,7 @@ namespace DrawingToolkitv01.DrawingObjectClasses
             {
                 obj.Deselect();
             }
-            ControlPoints = null;
+            
         }
 
         public List<IDrawingObject> GetComponent()
@@ -196,6 +195,14 @@ namespace DrawingToolkitv01.DrawingObjectClasses
             {
                 LocationChanged(this, EventArgs.Empty);
             }
+        }
+
+        public int GetArea()
+        {
+            int width = Math.Abs(this.start.X - this.end.X);
+            int height = Math.Abs(this.start.Y - this.end.Y);
+
+            return width * height;
         }
     }
 }

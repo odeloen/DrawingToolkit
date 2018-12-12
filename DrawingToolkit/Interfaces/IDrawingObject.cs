@@ -27,5 +27,7 @@ namespace DrawingToolkitv01.Interfaces
         void RenderOnStatic();
         void RenderOnMoveState();
         void RenderOnRotateState();
+
+        int GetArea();
     }
 }
