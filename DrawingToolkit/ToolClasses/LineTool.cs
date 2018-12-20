@@ -16,7 +16,7 @@ namespace DrawingToolkitv01.ToolClasses
     class LineTool : ToolStripButton, ITool
     {
         ICanvas _targetCanvas;
-        Line tempLine;
+        Line tempLine;        
 
         public LineTool()
         {
@@ -46,6 +46,7 @@ namespace DrawingToolkitv01.ToolClasses
                 this._targetCanvas.AddCommand(cmd);
                 tempLine.Deselect();
                 tempLine = null;
+                this._targetCanvas.ActiveStrategy.StrategyMouseUp();
             }            
         }
 
@@ -74,7 +75,7 @@ namespace DrawingToolkitv01.ToolClasses
 
         protected override void OnClick(EventArgs e)
         {
-            base.OnClick(e);
+            base.OnClick(e);            
             this._targetCanvas.ActiveTool = this;
             this._targetCanvas.DeselectAllObject();
             Console.WriteLine("Tool has been changed to " + this.Name);

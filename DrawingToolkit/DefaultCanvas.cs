@@ -17,10 +17,17 @@ namespace DrawingToolkitv01
         IUndoRedo undoRedo;
         ITool _activeTool;
         IStrategy strategy;
+        bool special;
 
         public ITool ActiveTool { get { return this._activeTool; } set { this._activeTool = value; } }
+        public IStrategy ActiveStrategy { get => this.strategy; set => this.strategy = value;  }
 
-        public IStrategy ActiveStrategy { get => this.strategy; set => this.strategy = value; }
+        public void Special(bool value)
+        {
+            this.special = value;
+            this.Invalidate();
+            this.Update();
+        }
 
         public DefaultCanvas()
         {
@@ -29,6 +36,7 @@ namespace DrawingToolkitv01
             this.DoubleBuffered = true;            
             this._activeTool = null;
             this.strategy = new DefaultStrategy();
+            this.special = false;
         }
 
         public void AddDrawingObject(IDrawingObject obj)
@@ -83,7 +91,7 @@ namespace DrawingToolkitv01
         protected override void OnPaint(PaintEventArgs e)
         {
             base.OnPaint(e);
-            this.strategy.Draw(e.Graphics);            
+            this.strategy.Draw(e.Graphics, this.special);            
         }
 
         protected override void OnMouseDown(MouseEventArgs e)
@@ -102,8 +110,7 @@ namespace DrawingToolkitv01
             base.OnMouseUp(e);
             if (this._activeTool != null)
             {
-                this._activeTool.OnMouseUp(this, e);
-                this.strategy.StrategyMouseUp();
+                this._activeTool.OnMouseUp(this, e);                
                 this.Invalidate();
                 this.Update();
             }

@@ -13,7 +13,7 @@ namespace DrawingToolkitv01.Interfaces
         void AddDrawingObject(IDrawingObject obj);
         void AddDrawingObjectAt(IDrawingObject obj, int idx);
         void RemoveDrawingObject(IDrawingObject obj);
-        void Draw(Graphics g);
+        void Draw(Graphics g, bool special);
 
         void StrategyMouseUp();
 

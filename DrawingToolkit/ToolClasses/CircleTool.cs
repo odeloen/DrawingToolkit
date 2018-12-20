@@ -46,6 +46,7 @@ namespace DrawingToolkitv01.ToolClasses
                 this._targetCanvas.AddCommand(cmd);
                 temp.Deselect();
                 temp = null;
+                this._targetCanvas.ActiveStrategy.StrategyMouseUp();
             }
         }
 

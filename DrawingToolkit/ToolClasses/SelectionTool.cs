@@ -84,8 +84,7 @@ namespace DrawingToolkitv01.ToolClasses
                     this._targetCanvas.AddCommand(cmd);
                 }
                 Move = false;
-            }
-
+            }            
             StateLeftMouseDown = false;
             this.lastDiff = new Point(0,0);
         }

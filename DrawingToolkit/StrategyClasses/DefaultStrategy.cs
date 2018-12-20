@@ -33,7 +33,7 @@ namespace DrawingToolkitv01.StrategyClasses
             this.ObjectsToDraw.Insert(idx, obj);
         }
 
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, bool special)
         {
             foreach (IDrawingObject obj in ObjectsToDraw)
             {

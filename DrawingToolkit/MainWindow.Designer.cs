@@ -63,6 +63,7 @@
             toolbox.AddTool(new ToolClasses.SquareTool());
             toolbox.AddTool(new ToolClasses.CircleTool());
             toolbox.AddTool(new ToolClasses.LineConnectorTool());
+            toolbox.AddTool(new ToolClasses.EraserTool());
             toolbox.AddTool(new ToolClasses.UndoTool());
             toolbox.AddTool(new ToolClasses.RedoTool());
             System.Windows.Forms.ToolStrip temp = (System.Windows.Forms.ToolStrip)toolbox;
@@ -83,23 +84,39 @@
             this.StrategyBox.SelectedIndex = 0;
             this.StrategyBox.SelectedIndexChanged += this.OnIndexChanged;
             this.Controls.Add(this.StrategyBox);
-        }
+
+            this.StrategyCheckBox = new System.Windows.Forms.CheckBox();
+            this.StrategyCheckBox.Text = "Show MBR";
+            this.StrategyCheckBox.Visible = false;
+            this.StrategyCheckBox.Checked = false;
+            this.StrategyCheckBox.Location = new System.Drawing.Point(400, 2);
+            this.StrategyCheckBox.CheckedChanged += this.OnCheckedChanged;
+            this.Controls.Add(this.StrategyCheckBox);
+        }        
 
         private void OnIndexChanged(object sender, System.EventArgs e)
         {
             if (this.StrategyBox.SelectedIndex == 0)
             {
                 this.canvas.ActiveStrategy = new StrategyClasses.DefaultStrategy();
+                this.StrategyCheckBox.Visible = false;
             }
             else
             {
                 this.canvas.ActiveStrategy = new StrategyClasses.RTreeStrategy();
+                this.StrategyCheckBox.Visible = true;
             }
+        }        
+
+        private void OnCheckedChanged(object sender, System.EventArgs e)
+        {
+            this.canvas.Special(this.StrategyCheckBox.Checked);
         }
 
         Interfaces.ICanvas canvas;
         Interfaces.IToolbox toolbox;
         System.Windows.Forms.ComboBox StrategyBox;
+        System.Windows.Forms.CheckBox StrategyCheckBox;
     }
 }
 

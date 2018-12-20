@@ -15,23 +15,24 @@ namespace DrawingToolkitv01.StrategyClasses
     {
         List<IDrawingObject> ObjectsToDraw;
         RNode root;
-        int MaximumNumberOfRooms = 3;
+        int MaximumNumberOfRooms = 4;
 
         public RTreeStrategy()
         {
             this.ObjectsToDraw = new List<IDrawingObject>();
             this.root = new RNode();
+            this.root.isLeaf = true;
         }
 
         public void AddDrawingObject(IDrawingObject obj)
         {
-            this.ObjectsToDraw.Add(obj);
-            
+            this.ObjectsToDraw.Add(obj);            
         }
 
         public void RemoveDrawingObject(IDrawingObject obj)
         {
-            this.ObjectsToDraw.Remove(obj);
+            //this.ObjectsToDraw.Remove(obj);            
+            this.Delete(obj);
         }
 
         public void AddDrawingObjectAt(IDrawingObject obj, int idx)
@@ -39,9 +40,9 @@ namespace DrawingToolkitv01.StrategyClasses
             this.ObjectsToDraw.Insert(idx, obj);
         }
 
-        public void Draw(Graphics g)
+        public void Draw(Graphics g, bool special)
         {
-            this.DrawMBR(g);
+            this.DrawMBR(g,special);
             /*
             foreach (IDrawingObject obj in ObjectsToDraw)
             {
@@ -53,17 +54,8 @@ namespace DrawingToolkitv01.StrategyClasses
 
         public IDrawingObject SelectObjectAt(Point loc)
         {
-            IDrawingObject selected = null;
-
-            foreach (IDrawingObject obj in ObjectsToDraw)
-            {
-                selected = obj.Intersect(loc);
-                if (selected != null)
-                {
-                    selected.Select();
-                    break;
-                }
-            }
+            IDrawingObject selected = this.Search(loc,this.root);
+            if (selected != null) selected.Select();            
             return selected;
         }
 
@@ -75,7 +67,7 @@ namespace DrawingToolkitv01.StrategyClasses
             }
         }
 
-        private void DrawMBR(Graphics g)
+        private void DrawMBR(Graphics g, bool drawMBR)
         {
             //Console.WriteLine("Draw MBR Start");
             List<RNode> queue = new List<RNode>();
@@ -84,18 +76,18 @@ namespace DrawingToolkitv01.StrategyClasses
             while (queue.Count > 0)
             {
                 RNode currNode = queue.First();
-                foreach (IDrawingObject obj in currNode.Objs)
+                foreach (REntry entry in currNode.entries)
                 {
-                    obj.TargetGraphics = g;
-                    obj.Draw();
-                }
-                if (!currNode.IsLeaf())
-                {
-                    foreach (RNode child in currNode.Children)
+                    if (drawMBR || currNode.isLeaf)
+                    {                        
+                        entry.key.TargetGraphics = g;
+                        entry.key.Draw();
+                    }                    
+                    if (!currNode.isLeaf)
                     {
-                        queue.Add(child);
+                        queue.Add(entry.child);
                     }
-                }
+                }                
                 queue.Remove(currNode);
             }
             //Console.WriteLine("Draw MBR End");
@@ -133,51 +125,50 @@ namespace DrawingToolkitv01.StrategyClasses
 
         public void StrategyMouseUp()
         {
-            this.Insert(ObjectsToDraw.Last());
+            this.Insert(new REntry(ObjectsToDraw.Last()));
         }
 
-        private IDrawingObject Search(Point E, RNode T)
-        {
-            IDrawingObject res = null;
-            if (!T.IsLeaf())
+        private IDrawingObject Search(Point S, RNode T)
+        {            
+            if (!T.isLeaf)
             {
-                List<IDrawingObject> TMBRs = T.Objs;
-                
-                foreach(IDrawingObject MBR in TMBRs)
-                {
-                    if (MBR.Intersect(E) != null)
+                foreach(REntry entry in T.entries)
+                {                    
+                    IDrawingObject intersected = entry.key.Intersect(S);
+                    if (intersected != null)
                     {
-                        int index = TMBRs.IndexOf(MBR);
-                        res = Search(E, T.Children[index]);
-                        if (res != null) return res;
+                        Console.WriteLine("Intersected with MBR");
+                        return Search(S, entry.child);
                     }
                 }
-                return null;
             }
             else
             {
-                List<IDrawingObject> ObjectToSearch = T.Objs;                
-                foreach (IDrawingObject obj in ObjectToSearch)
+                foreach (REntry entry in T.entries)
                 {
-                    res = obj.Intersect(E);
-                    if (res != null)
+                    IDrawingObject intersected = entry.key.Intersect(S);
+                    if (intersected != null)
                     {
-                        return res;
+                        Console.WriteLine("Intersected with DrawingObject");
+                        return entry.key;
                     }
                 }
-                return null;
             }
+
+            return null;
         }
 
-        private void Insert(IDrawingObject E)
+        private void Insert(REntry E)
         {
             // I1 Find position for the new record
             RNode L = this.ChooseLeaf(E);
             RNode LL = null;
 
-            // I2 Add record to leaf node
-            L.Objs.Add(E);     
-            if (!L.IsRoot() && L.Objs.Count > this.MaximumNumberOfRooms)
+            // I2 Add record to leaf node                        
+            L.AddEntry(E);
+            Console.WriteLine("Leaf size : " + L.entries.Count);
+            if (L.IsRoot()) Console.WriteLine("Root is selected");
+            if (!L.IsRoot() && L.entries.Count > this.MaximumNumberOfRooms)
             {
                 Tuple<RNode, RNode> tempNodes = this.NodeSplitting(L);
                 L = tempNodes.Item1;
@@ -185,43 +176,69 @@ namespace DrawingToolkitv01.StrategyClasses
             }
 
             // I3 Propagates changes upward
-            this.AdjustTree(L, LL);
+            Tuple<RNode, RNode> propagationProduct = this.AdjustTree(L, LL);
 
             // I4 Grow tree taller
-            if (this.root.Objs.Count > this.MaximumNumberOfRooms)
-            {                
-                Tuple<RNode, RNode> tempNodes = this.NodeSplitting(this.root);
-                Console.WriteLine("Object at root before : " + this.root.Objs.Count);
-                RNode ChildOfRoot1 = tempNodes.Item1;
-                ChildOfRoot1.parent = this.root;
-                this.root.Children.Add(ChildOfRoot1);
-                MBR newMBR = this.CreateMBR(ChildOfRoot1.Objs);
-                this.root.Objs.Add(newMBR);
+            if (propagationProduct.Item2 != null)
+            {
+                Console.WriteLine("Object at root before : " + this.root.entries.Count);
+
+                this.root = new RNode();
+                this.root.isLeaf = false;
+                this.root.parent = null;
+
+                RNode ChildOfRoot1 = propagationProduct.Item1;                
+                MBR newMBR = this.CreateMBR(this.makeGroupfromEntries(ChildOfRoot1.entries));
+                this.root.AddEntry(new REntry(newMBR, ChildOfRoot1));
+                Console.WriteLine("Child1 of root size : " + ChildOfRoot1.entries.Count);
+
+                RNode ChildOfRoot2 = propagationProduct.Item2;                
+                newMBR = this.CreateMBR(this.makeGroupfromEntries(ChildOfRoot2.entries));
+                this.root.AddEntry(new REntry(newMBR, ChildOfRoot2));
+                Console.WriteLine("Child2 of root size : " + ChildOfRoot2.entries.Count);
+
+                Console.WriteLine("Object at root after : " + this.root.entries.Count);
+            }
+
+            if (this.root.entries.Count > this.MaximumNumberOfRooms)
+            {
+                Console.WriteLine("Object at root before : " + this.root.entries.Count);
+                Tuple<RNode, RNode> tempNodes = this.NodeSplitting(this.root);                
+                this.root = new RNode();
+                this.root.isLeaf = false;
+                this.root.parent = null;
+
+                RNode ChildOfRoot1 = tempNodes.Item1;                
+                MBR newMBR = this.CreateMBR(this.makeGroupfromEntries(ChildOfRoot1.entries));
+                this.root.AddEntry(new REntry(newMBR, ChildOfRoot1));
+                Console.WriteLine("Child1 of root size : " + ChildOfRoot1.entries.Count);
 
                 RNode ChildOfRoot2 = tempNodes.Item2;
                 ChildOfRoot2.parent = this.root;
-                this.root.Children.Add(ChildOfRoot2);
-                newMBR = this.CreateMBR(ChildOfRoot2.Objs);
-                this.root.Objs.Add(newMBR);
-                Console.WriteLine("Object at root after : " + this.root.Objs.Count);
+                newMBR = this.CreateMBR(this.makeGroupfromEntries(ChildOfRoot2.entries));
+                this.root.AddEntry(new REntry(newMBR, ChildOfRoot2));
+                Console.WriteLine("Child2 of root size : " + ChildOfRoot2.entries.Count);
+
+                Console.WriteLine("Object at root after : " + this.root.entries.Count);
             }
+            Console.WriteLine("========= Insert Done ======== " + this.ObjectsToDraw.Count);
         }
 
-        private RNode ChooseLeaf(IDrawingObject obj)
+        private RNode ChooseLeaf(REntry E)
         {
+            IDrawingObject obj = E.key;
             Console.WriteLine("Choosing Leaf");
             RNode N = this.root;
-            
-            while (!N.IsLeaf())
-            {
-                Console.WriteLine("Node ID : " + N.GetHashCode());
-                List<IDrawingObject> NMBRs = N.Objs;
+            Console.WriteLine("Root ID : " + N.GetHashCode());
+            Console.WriteLine("Root Size : " + N.entries.Count);
+            while (!N.isLeaf)
+            {                                
                 int MinArea = int.MaxValue;
                 int index = 0;
-                foreach (IDrawingObject MBR in NMBRs)
+                foreach (REntry entry in N.entries)
                 {
                     List<IDrawingObject> tempList = new List<IDrawingObject>();
-                    tempList.Add(MBR);
+                    tempList.Add(entry.key);
                     tempList.Add(obj);
                     MBR newMBR = this.CreateMBR(tempList);
 
@@ -229,21 +246,21 @@ namespace DrawingToolkitv01.StrategyClasses
                     if (tempArea < MinArea)
                     {
                         MinArea = tempArea;
-                        index = NMBRs.IndexOf(MBR);
-                        Console.WriteLine("Objects Size  : " + NMBRs.Count);
-                        Console.WriteLine("Children Size : " + N.Children.Count);                        
+                        index = N.entries.IndexOf(entry);
                     }
                 }
-                N = N.Children[index];
+                N = N.entries[index].child;
+                Console.WriteLine("Node ID : " + N.GetHashCode());
+                Console.WriteLine("Node Size : " + N.entries.Count);
             }
-            Console.WriteLine("Chosen Leaf ID : " + N.GetHashCode());
+            //Console.WriteLine("Chosen Leaf ID : " + N.GetHashCode());
             Console.WriteLine("Choosing Leaf Done");
             return N;
         }
 
-        private void AdjustTree(RNode L, RNode LL)
+        private Tuple<RNode, RNode> AdjustTree(RNode L, RNode LL)
         {
-            Console.WriteLine("Adjusting tree start");
+            Console.WriteLine("=== Adjusting tree start");
             RNode N = L;
             RNode NN = LL;
 
@@ -251,141 +268,255 @@ namespace DrawingToolkitv01.StrategyClasses
             {
                 RNode P = N.parent;
                 RNode PP = null;
-                int EN = P.Children.IndexOf(N);
-                Console.WriteLine("Current Node : " + N.GetHashCode());
-                Console.WriteLine("Parent Node : " + P.GetHashCode());
-                Console.WriteLine("Objs Size : " + P.Objs.Count);
-                Console.WriteLine("Children Size : " + P.Children.Count);
-                Console.WriteLine("EN : " + EN);
+                int EN = this.getIndexfromChild(P,N);
+                Console.WriteLine("Current node : " + N.GetHashCode());
+                Console.WriteLine("Parent node : " + P.GetHashCode());
+                Console.WriteLine("Parent entries begin size : " + P.entries.Count);
 
-                MBR newMBR = this.CreateMBR(N.Objs);
-                P.Objs[EN] = newMBR;
+                MBR newMBR = this.CreateMBR(this.makeGroupfromEntries(N.entries));
+                P.entries[EN].key = newMBR;
 
                 if (NN != null)
                 {
-                    newMBR = this.CreateMBR(NN.Objs);
-                    P.Objs.Add(newMBR);
-                    P.Children.Add(NN);
+                    newMBR = this.CreateMBR(this.makeGroupfromEntries(NN.entries));
+                    REntry entry = new REntry(newMBR, NN);
+                    P.AddEntry(entry);                    
 
-                    if (P.Objs.Count > this.MaximumNumberOfRooms)
+                    if (P.entries.Count > this.MaximumNumberOfRooms)
                     {
                         Tuple<RNode, RNode> tempNodes = this.NodeSplitting(P);
                         P = tempNodes.Item1;
                         PP = tempNodes.Item2;
                     }
                 }
+                Console.WriteLine("Parent1 entries end size : " + P.entries.Count);
+                if (PP != null) Console.WriteLine("Parent2 entries end size : " + PP.entries.Count);
 
                 N = P;
                 NN = PP;
-            }
-            Console.WriteLine("Adjusting tree end");
+            }            
+            Console.WriteLine(N.entries.Count);
+            Console.WriteLine("=== Adjusting tree end");
+            return new Tuple<RNode, RNode>(N, NN);
         }
 
         private void Delete(IDrawingObject obj)
         {
+            RNode L = this.FindLeaf(obj, this.root);
+            
+            foreach(REntry entry in L.entries)
+            {
+                if (obj.GetHashCode() == entry.key.GetHashCode())
+                {
+                    L.entries.Remove(entry);
+                    break;
+                }
+            }
 
+            CondenseTree(L);
+
+            if (!L.IsRoot() && this.root.entries.Count == 1)
+            {
+                this.root = this.root.entries[0].child;
+                this.root.parent = null;
+            }
         }
 
-        private RNode FindLeaf(IDrawingObject obj)
-        {
+        private RNode FindLeaf(IDrawingObject obj, RNode T)
+        {            
+            Console.WriteLine("== Find leaf start");
+            int x = (obj.Start.X + obj.End.X) / 2;
+            int y = (obj.Start.Y + obj.End.Y) / 2;
+            Point mid = new Point(x,y);
+            if (!T.isLeaf)
+            {
+                foreach(REntry entry in T.entries)
+                {
+                    IDrawingObject intersected = entry.key.Intersect(mid);
+                    if (intersected != null)
+                    {
+                        RNode leaf = this.FindLeaf(obj, entry.child);
+                        if (leaf != null)
+                        {
+                            return leaf;
+                        }
+                        
+                    }
+                }
+            }
+            else
+            {
+                foreach (REntry entry in T.entries)
+                {
+                    IDrawingObject intersected = entry.key.Intersect(mid);
+                    if (intersected != null)
+                    {
+                        Console.WriteLine("Leaf Found");
+                        return T;
+                    }
+
+                }
+            }            
             return null;
         }
 
-        private void CondenseTree()
+        private void CondenseTree(RNode L)
         {
+            RNode N = L;
+            List<RNode> Q = new List<RNode>();
 
+            while (!N.IsRoot())
+            {
+                RNode P = N.parent;
+                int EN = this.getIndexfromChild(P, N);
+                
+                if (N.entries.Count < this.MaximumNumberOfRooms / 2)
+                {
+                    P.entries.RemoveAt(EN);
+                    Q.Add(N);                    
+                }
+                else
+                {
+                    MBR newMBR = this.CreateMBR(this.makeGroupfromEntries(N.entries));
+                    P.entries[EN].key = newMBR;
+                }
+
+                N = P;
+            }
+
+            List<REntry> entriesTobeInserted = new List<REntry>();
+
+            while (Q.Count > 0)
+            {
+                RNode currNode = Q.First();
+                if (currNode.isLeaf)
+                {
+                    entriesTobeInserted.AddRange(currNode.entries);
+                }
+                else
+                {
+                    foreach(REntry entry in currNode.entries)
+                    {
+                        Q.Add(entry.child);
+                    }
+                }
+                Q.Remove(currNode);
+            }
+
+            foreach(REntry entry in entriesTobeInserted)
+            {
+                this.Insert(entry);
+            }
         }
 
         private Tuple<RNode, RNode> NodeSplitting(RNode N)
         {
-            Console.WriteLine("Splitting Node : " + N.GetHashCode());
-            Tuple<RNode, RNode> temp = this.QuadraticSplit(N);
+            Console.WriteLine("== Splitting Node : " + N.GetHashCode());
+            Tuple<RNode, RNode> temp = this.QuadraticSplit(N);            
             Console.WriteLine("Splitting Node To " + temp.Item1.GetHashCode() + " and " + temp.Item2.GetHashCode());
-            Console.WriteLine("Splitting Complete");
+            Console.WriteLine("== Splitting Complete");
             return temp;
         }
 
         private Tuple<RNode,RNode> QuadraticSplit(RNode N)
         {
-            Console.WriteLine("Quadratic Split Start");
-            RNode Group1 = new RNode();
-            RNode Group2 = new RNode();
-            Group1.parent = N.parent;
-            Group2.parent = N.parent;
+            
+            Console.WriteLine("=== Quadratic Split Start");
+            RNode NN = new RNode();
+            NN.isLeaf = N.isLeaf;            
 
-            Tuple <IDrawingObject, IDrawingObject> seed = this.PickSeeds(N.Objs);            
-            TransferNodeContent(N, Group1, seed.Item1);
-            TransferNodeContent(N, Group2, seed.Item2);            
+            List<REntry> tempEntries = N.entries;
+            N.entries = new List<REntry>();            
+            Tuple <REntry, REntry> seed = this.PickSeeds(tempEntries);
+            N.AddEntry(seed.Item1);            
+            tempEntries.Remove(seed.Item1);
+            NN.AddEntry(seed.Item2);            
+            tempEntries.Remove(seed.Item2);
+            Console.WriteLine("N begin size " + N.entries.Count);
+            Console.WriteLine("NN begin size " + NN.entries.Count);
 
-            while (N.Objs.Count > 0)
+            MBR NMBR = new MBR();
+            MBR NNMBR = new MBR();
+            while (tempEntries.Count > 0)
             {
-                if (Group1.Objs.Count > this.MaximumNumberOfRooms / 2)
+                if (N.entries.Count > this.MaximumNumberOfRooms / 2)
                 {
-                    while (N.Objs.Count > 0)
+                    Console.WriteLine("N is full");
+                    while (tempEntries.Count > 0)
                     {
-                        IDrawingObject obj = N.Objs.Last();
-                        TransferNodeContent(N, Group2, obj);
+                        REntry entry = tempEntries.Last();
+                        NN.AddEntry(entry);                        
+                        tempEntries.Remove(entry);
+                        Console.WriteLine("Adding to NN");
                     }
                 }
-                else if (Group2.Objs.Count > this.MaximumNumberOfRooms / 2)
+                else if (NN.entries.Count > this.MaximumNumberOfRooms / 2)
                 {
-                    while (N.Objs.Count > 0)
+                    Console.WriteLine("NN is full");
+                    while (tempEntries.Count > 0)
                     {
-                        IDrawingObject obj = N.Objs.Last();
-                        TransferNodeContent(N, Group2, obj);
+                        REntry entry = tempEntries.Last();
+                        N.AddEntry(entry);                        
+                        tempEntries.Remove(entry);
+                        Console.WriteLine("Adding to N");
                     }
                 }
                 else
                 {
-                    IDrawingObject obj = PickNext(N.Objs, Group1.mbr, Group2.mbr);
-
                     List<IDrawingObject> list1 = new List<IDrawingObject>();
-                    list1.AddRange(Group1.Objs);
-                    list1.Add(obj);
+                    list1.AddRange(this.makeGroupfromEntries(N.entries));                    
                     MBR newMBR1 = this.CreateMBR(list1);
 
                     List<IDrawingObject> list2 = new List<IDrawingObject>();
-                    list2.AddRange(Group2.Objs);
-                    list2.Add(obj);
+                    list2.AddRange(this.makeGroupfromEntries(NN.entries));                    
                     MBR newMBR2 = this.CreateMBR(list2);
+
+                    REntry entry = PickNext(tempEntries, newMBR1, newMBR2);
+
+                    list1.Add(entry.key);
+                    newMBR1 = this.CreateMBR(list1);
+
+                    list2.Add(entry.key);
+                    newMBR2 = this.CreateMBR(list2);
 
                     if (newMBR1.GetArea() < newMBR2.GetArea())
                     {
-                        TransferNodeContent(N, Group1, obj);
+                        N.AddEntry(entry);                        
                     }
                     else if (newMBR1.GetArea() > newMBR2.GetArea())
                     {
-                        TransferNodeContent(N, Group2, obj);
+                        NN.AddEntry(entry);                        
                     }
-                    else if (Group1.Objs.Count < Group2.Objs.Count)
+                    else if (N.entries.Count < N.entries.Count)
                     {
-                        TransferNodeContent(N, Group1, obj);
+                        N.AddEntry(entry);                        
                     }
                     else
                     {
-                        TransferNodeContent(N, Group2, obj);
+                        NN.AddEntry(entry);                        
                     }
+                    tempEntries.Remove(entry);
                 }
             }
-            
-            Tuple<RNode, RNode> res = new Tuple<RNode, RNode>(Group1, Group2);
-            Console.WriteLine("Quadratic Split End");
+            Console.WriteLine("N end size " + N.entries.Count);
+            Console.WriteLine("NN end size " + NN.entries.Count);
+            Tuple<RNode, RNode> res = new Tuple<RNode, RNode>(N, NN);
+            Console.WriteLine("=== Quadratic Split End");
             return res;
         }
 
-        private Tuple<IDrawingObject, IDrawingObject> PickSeeds(List<IDrawingObject> Objs)
+        private Tuple<REntry, REntry> PickSeeds(List<REntry> entries)
         {
             
             int selected1 = -1, selected2 = -1;
             int MaxD = int.MinValue;
-            for (int i = 0;i < Objs.Count; i++)
+            for (int i = 0;i < entries.Count; i++)
             {
-                for(int j = 0; j< Objs.Count; j++)
+                for(int j = 0; j< entries.Count; j++)
                 {
-                    if (i == j) continue;
-                    // MBRS
-                    IDrawingObject e1 = Objs[i];
-                    IDrawingObject e2 = Objs[j];
+                    if (i == j) continue;                    
+                    IDrawingObject e1 = entries[i].key;
+                    IDrawingObject e2 = entries[j].key;
                     List<IDrawingObject> tempList = new List<IDrawingObject>();
                     tempList.Add(e1); tempList.Add(e2);
                     MBR newMBR = CreateMBR(tempList);
@@ -399,38 +530,38 @@ namespace DrawingToolkitv01.StrategyClasses
                     }
                 }
             }
-            Tuple<IDrawingObject, IDrawingObject> res = new Tuple<IDrawingObject, IDrawingObject>(Objs[selected1], Objs[selected2]);
-            //res.Add(Objs[selected1]); res.Add(Objs[selected2]);
+            Console.WriteLine("Size : " + entries.Count + " selected 1 : " + selected1 + " selected 2 : " + selected2);            
+            Tuple<REntry, REntry> res = new Tuple<REntry, REntry>(entries[selected1], entries[selected2]);            
             return res;
         }
 
-        private IDrawingObject PickNext(List<IDrawingObject> Objs, MBR mbr1, MBR mbr2)
+        private REntry PickNext(List<REntry> entries, MBR mbr1, MBR mbr2)
         {
-            Console.WriteLine("PickNext Start");
-            IDrawingObject res = null;            
+            Console.WriteLine("==== PickNext Start");
+            REntry res = null;            
 
             int MaxD = int.MinValue;
-            foreach (IDrawingObject obj in Objs)
+            foreach (REntry entry in entries)
             {
                 List<IDrawingObject> Group1 = new List<IDrawingObject>();
                 Group1.Add(mbr1);
-                Group1.Add(obj);
+                Group1.Add(entry.key);
                 MBR newMBR1 = CreateMBR(Group1);
                 int d1 = newMBR1.GetArea() - mbr1.GetArea();
 
                 List<IDrawingObject> Group2 = new List<IDrawingObject>();
-                Group1.Add(mbr2);
-                Group1.Add(obj);
-                MBR newMBR2 = CreateMBR(Group1);
+                Group2.Add(mbr2);
+                Group2.Add(entry.key);
+                MBR newMBR2 = CreateMBR(Group2);
                 int d2 = newMBR2.GetArea() - mbr2.GetArea();
 
                 if (Math.Abs(d1 - d2) > MaxD)
                 {
-                    res = obj; 
+                    res = entry; 
                 }
             }
 
-            Console.WriteLine("PickNext End with result : " + res.GetHashCode());
+            Console.WriteLine("==== PickNext End with result : " + res.GetHashCode());
             return res;
         }
 
@@ -442,26 +573,30 @@ namespace DrawingToolkitv01.StrategyClasses
         private void LinearPickSeeds()
         {
 
-        }
-
-        private void TransferNodeContent(RNode from, RNode to, IDrawingObject targetObject)
+        }      
+        
+        private List<IDrawingObject> makeGroupfromEntries(List<REntry> entries)
         {
-            int index = from.Objs.IndexOf(targetObject);
-            Console.WriteLine("From : " + from.GetHashCode());
-            Console.WriteLine("Objs Size : " + from.Objs.Count);
-            Console.WriteLine("Children Size : " + from.Children.Count);
-            Console.WriteLine("Index : " + index);
+            List<IDrawingObject> res = new List<IDrawingObject>();
 
-            Console.WriteLine("To : " + to.GetHashCode());
-            Console.WriteLine("Objs Size : " + from.Objs.Count);
-            
-            to.Objs.Add(targetObject);
-            from.Objs.Remove(targetObject);
-            if (!from.IsLeaf())
+            foreach (REntry entry in entries)
             {
-                to.Children.Add(from.Children[index]);
-                from.Children.RemoveAt(index);
-            }                     
+                res.Add(entry.key);
+            }
+
+            return res;
+        }
+        
+        private int getIndexfromChild(RNode parent, RNode child)
+        {            
+            for (int idx = 0; idx < parent.entries.Count ; idx++)
+            {
+                if(parent.entries[idx].child.GetHashCode() == child.GetHashCode())
+                {
+                    return idx;
+                }
+            }
+            return -1;
         }
     }
 }

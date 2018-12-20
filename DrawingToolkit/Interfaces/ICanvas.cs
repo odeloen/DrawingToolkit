@@ -10,6 +10,7 @@ namespace DrawingToolkitv01.Interfaces
     {
         ITool ActiveTool { get; set; }
         IStrategy ActiveStrategy { get; set; }
+        void Special(bool value);
 
         void AddDrawingObject(IDrawingObject obj);
         void AddDrawingObjectAt(int index, IDrawingObject obj);

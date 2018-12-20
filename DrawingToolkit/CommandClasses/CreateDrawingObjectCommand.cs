@@ -30,6 +30,7 @@ namespace DrawingToolkitv01.CommandClasses
             else
             {
                 this.canvas.AddDrawingObject(this.obj);
+                this.canvas.ActiveStrategy.StrategyMouseUp();
             }
             Console.WriteLine("Create executed");
         }
